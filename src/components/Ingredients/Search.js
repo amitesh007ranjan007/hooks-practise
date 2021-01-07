@@ -1,0 +1,38 @@
+import React, { useEffect, useState } from 'react';
+
+import Card from '../UI/Card';
+import './Search.css';
+
+const Search = React.memo(props => {
+  const [filteredItem, setFilteredItem] = useState('');
+  const { onLoadFilteredData} = props;
+  useEffect(() => {
+    const query = filteredItem.length === 0 ? '' : `?orderBy="title"&equalTo="${filteredItem}"`;
+    fetch('https://react-hooks-update-f7413-default-rtdb.firebaseio.com/ingredients.json'+query)
+     .then(response => response.json())
+     .then(responseData => {
+      const ingredientsData = []
+       for (let key in responseData) {
+         ingredientsData.push({
+           id: key,
+           title: responseData[key].title,
+           amount: responseData[key].amount
+         })
+       }
+       onLoadFilteredData(ingredientsData)
+     })
+  }, [filteredItem, onLoadFilteredData])
+  return (
+    <section className="search">
+      {console.log('Search rendered again', filteredItem)}
+      <Card>
+        <div className="search-input">
+          <label>Filter by Title</label>
+          <input type="text" value={filteredItem} onChange={event => setFilteredItem(event.target.value)} />
+        </div>
+      </Card>
+    </section>
+  );
+});
+
+export default Search;
